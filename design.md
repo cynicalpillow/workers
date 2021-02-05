@@ -12,6 +12,8 @@ To keep things simple, the REST API will have no authentication. Endpoints retur
 |:--|:--|:--|:--|
 | file_path | string | body | File path of the Linux application to run or command plus parameters |
 
+Note: Shell constructs will not work (ie. ls -l | grep "\.txt$")
+
 Endpoint to start a worker to run a Linux application with the specified file path.
 
     GET/query/<pid>

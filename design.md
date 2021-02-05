@@ -10,7 +10,7 @@ To keep things simple, the REST API will have no authentication. Endpoints retur
 **Parameters**
 | Name | Type  | In | Description |
 |:--|:--|:--|:--|
-| file_path | string | body | File path of the Linux application to run |
+| file_path | string | body | File path of the Linux application to run or command plus parameters |
 
 Endpoint to start a worker to run a Linux application with the specified file path.
 
@@ -60,7 +60,7 @@ Job is an abstraction of the application that's needed to run.
 	- Result (Result)
 	- Status (integer)
 - Methods
-	- getApplication() -> string
+	- getCommand() -> string
 	- getResult() -> Result
 	- setResult() -> void (Will only set the result once)
 	- getStatus() -> integer

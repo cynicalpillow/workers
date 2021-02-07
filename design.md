@@ -6,7 +6,7 @@ This document will describe a high level overview of a Java worker library with 
 
 To keep things simple, the REST API will have no authentication. Endpoints return JSON data in the response.
 
-    POST /start
+    POST /worker/start
 **Parameters**
 | Name | Type  | In | Description |
 |:--|:--|:--|:--|
@@ -16,10 +16,10 @@ Note: Shell constructs will not work (ie. ls -l | grep "\.txt$")
 
 Endpoint to start a worker to run a Linux application with the specified file path.
 
-    GET/query/<pid>
+    GET /worker/query/<pid>
 Endpoint for retrieving information on the status of a running process/worker with a specified process id integer.
   
-    GET/stop/<pid>
+    GET /worker/stop/<pid>
 Endpoint for stopping a running process/worker with a specified process id integer.
 
 ## Design

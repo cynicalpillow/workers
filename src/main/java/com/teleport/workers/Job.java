@@ -27,7 +27,11 @@ public class Job {
         this.command = Arrays.asList(command.trim().split("\\s+"));
     }
 
-    public String getCommand() {
+    public List<String> getCommand() {
+        return command;
+    }
+
+    public String getCommandString() {
         return String.join(" ", command);
     }
 

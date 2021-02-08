@@ -1,6 +1,7 @@
 package com.teleport.workers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
@@ -15,7 +16,8 @@ public class JobTest {
     @Test
     public void commandShouldParseCorrectly() {
         Job j = new Job("  ls   -a  -l  ");
-        assertEquals(j.getCommand(), "ls -a -l");
+        assertArrayEquals(j.getCommand().toArray(), new String[]{"ls", "-a", "-l"});
+        assertEquals(j.getCommandString(), "ls -a -l");
     }
 
     /**
@@ -24,6 +26,7 @@ public class JobTest {
     @Test
     public void emptyCommandShouldParseCorrectly() {
         Job j = new Job("");
-        assertEquals(j.getCommand(), "");
+        assertArrayEquals(j.getCommand().toArray(), new String[]{""});
+        assertEquals(j.getCommandString(), "");
     }
 }

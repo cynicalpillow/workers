@@ -35,14 +35,14 @@ public class Job {
         return String.join(" ", command);
     }
 
-    public void setStatus(int status) throws IllegalArgumentException {
+    public synchronized void setStatus(int status) throws IllegalArgumentException {
         if (status != 0 && status != -1 && status != 1) {
             throw new IllegalArgumentException("Invalid status value");
         }
         this.status = status;
     }
 
-    public int getStatus() {
+    public synchronized int getStatus() {
         return status;
     }
 

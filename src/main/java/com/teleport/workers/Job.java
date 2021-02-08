@@ -6,6 +6,11 @@ import java.util.List;
 /**
  * Job class
  * Represents an arbitrary Linux application or command
+ *
+ * Status values:
+ * 0 - Not executing (finished or hasn't been queued)
+ * 1 - Executing
+ * -1 - Error (job couldn't be ran or another error occured while creating the process)
  */
 public class Job {
     private List<String> command;

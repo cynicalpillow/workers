@@ -35,11 +35,10 @@ public class Job {
         return String.join(" ", command);
     }
 
-    public void setStatus(int status) {
+    public void setStatus(int status) throws IllegalArgumentException {
         if (status != 0 && status != -1 && status != 1) {
-            return;
+            throw new IllegalArgumentException("Invalid status value");
         }
-
         this.status = status;
     }
 
@@ -52,10 +51,11 @@ public class Job {
     * Workers will call this from a separate thread to store the result back into
     * the job they have been tasked with. This should only be set once, hence the null check.
     */
-    public synchronized void setResult(Result result) {
-        if (this.result == null) {
-            this.result = result;
+    public synchronized void setResult(Result result) throws IllegalArgumentException {
+        if (this.result != null) {
+            throw new IllegalArgumentException("Result already assigned");
         }
+        this.result = result;
     }
 
     public synchronized Result getResult() {

@@ -33,7 +33,7 @@ public class JobTest {
     /**
      * Test job with assigned result should throw exception
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void settingFinishedJobShouldThrowException() {
         Job j = new Job("");
         j.setResult(new Result("", ""));

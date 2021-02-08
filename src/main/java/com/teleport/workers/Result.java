@@ -6,8 +6,8 @@ package com.teleport.workers;
  */
 public class Result {
 
-    private String output = "";
-    private String error = "";
+    private String output;
+    private String error;
 
     /**
     * Result constructor

@@ -32,6 +32,10 @@ public class Job {
     }
 
     public void setStatus(int status) {
+        if (status != 0 && status != -1 && status != 1) {
+            return;
+        }
+
         this.status = status;
     }
 

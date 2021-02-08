@@ -26,6 +26,10 @@ public class Job {
         return String.join(" ", command);
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public int getStatus() {
         return status;
     }

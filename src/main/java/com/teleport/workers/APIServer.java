@@ -28,7 +28,7 @@ public class APIServer extends HttpServlet {
 
     private JobManager manager;
     private String invalidRequest;
-    private Map<Integer, String> statusMap;
+    private Map<Job.JobStatus, String> statusMap;
     private String file_path_key;
 
     @Override
@@ -37,9 +37,9 @@ public class APIServer extends HttpServlet {
         invalidRequest = new JSONObject().put("error", "invalid request").toString(INDENT_SIZE);
         file_path_key = "file_path";
         statusMap = new HashMap<>();
-        statusMap.put(0, "not running");
-        statusMap.put(1, "running");
-        statusMap.put(-1, "error while starting process");
+        statusMap.put(Job.JobStatus.STOPPED, "stopped");
+        statusMap.put(Job.JobStatus.FINISHED, "finished");
+        statusMap.put(Job.JobStatus.RUNNING, "running");
     }
 
     /**
@@ -55,16 +55,6 @@ public class APIServer extends HttpServlet {
         out.flush();
     }
 
-    private String generateStatus(Job job) {
-        String status = "";
-        if (job.getResult() != null && job.getStatus() == 0) {
-            status = "finished";
-        } else {
-            status = statusMap.get(job.getStatus());
-        }
-        return status;
-    }
-
     private String buildJobJson(Job job, boolean raw) {
         if (raw && (job == null || job.getResult() == null)) {
             return "";
@@ -76,7 +66,7 @@ public class APIServer extends HttpServlet {
             return new JSONObject().put("error", "job does not exist").toString(INDENT_SIZE);
         }
 
-        String status = generateStatus(job);
+        String status = statusMap.get(job.getStatus());
         JSONObject outputJson = new JSONObject();
         try {
             outputJson = outputJson.put("status", status);
@@ -128,11 +118,16 @@ public class APIServer extends HttpServlet {
         String endpoint = paths[2];
         Long pid = Long.parseLong(paths[3]);
 
+        if (endpoint.equals("stop") && paths.length > 4) {
+            printAndFlush(out, invalidRequest);
+            return;
+        }
+
         if (endpoint.equals("query")) {
             boolean raw = false;
             if (paths.length == 5 && paths[4].equals("raw")) {
                 raw = true;
-            } else if (paths.length != 4) {
+            } else if (paths.length > 4) {
                 printAndFlush(out, invalidRequest);
                 return;
             }

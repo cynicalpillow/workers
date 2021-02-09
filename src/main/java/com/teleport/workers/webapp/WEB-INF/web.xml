@@ -1,0 +1,11 @@
+<web-app>
+  <display-name>Worker API</display-name>
+  <servlet>
+    <servlet-name>WorkerAPI</servlet-name>
+    <servlet-class>com.teleport.workers.APIServer</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WorkerAPI</servlet-name>
+    <url-pattern>/worker/*</url-pattern>
+  </servlet-mapping>
+</web-app>

@@ -14,8 +14,15 @@ import java.util.List;
  */
 public class Job {
     private List<String> command;
-    private int status;
+    private JobStatus status;
     private Result result;
+
+    public enum JobStatus {
+        STOPPED,
+        FINISHED,
+        RUNNING,
+        ERROR
+    }
 
     /**
     * Job constructor
@@ -25,6 +32,7 @@ public class Job {
     */
     public Job(String command) {
         this.command = Arrays.asList(command.trim().split("\\s+"));
+        this.status = JobStatus.STOPPED;
     }
 
     public List<String> getCommand() {
@@ -35,14 +43,11 @@ public class Job {
         return String.join(" ", command);
     }
 
-    public synchronized void setStatus(int status) throws IllegalArgumentException {
-        if (status != 0 && status != -1 && status != 1) {
-            throw new IllegalArgumentException("Invalid status value");
-        }
+    public synchronized void setStatus(JobStatus status) {
         this.status = status;
     }
 
-    public synchronized int getStatus() {
+    public synchronized JobStatus getStatus() {
         return status;
     }
 

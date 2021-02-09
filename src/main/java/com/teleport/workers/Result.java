@@ -7,22 +7,17 @@ package com.teleport.workers;
 public class Result {
 
     private String output;
-    private String error;
 
     /**
     * Result constructor
-    * Each Result must have an output string and an error string
+    * Each Result must have an output/error string
+    * Note: Error output is merged with standard output
     */
-    public Result(String output, String error) {
+    public Result(String output) {
         this.output = output;
-        this.error = error;
     }
 
     public String getOutput() {
         return output;
-    }
-
-    public String getError() {
-        return error;
     }
 }

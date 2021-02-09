@@ -36,8 +36,8 @@ public class JobTest {
     @Test(expected = IllegalStateException.class)
     public void settingFinishedJobShouldThrowException() {
         Job j = new Job("");
-        j.setResult(new Result("", ""));
-        j.setResult(new Result("invalid", "invalid"));
+        j.setResult(new Result(""));
+        j.setResult(new Result("invalid"));
     }
 
     /**

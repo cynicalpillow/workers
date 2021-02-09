@@ -20,22 +20,27 @@ import org.json.JSONObject;
 /**
  * API server implemented as a Java servlet
  * Provides an HTTP api to start, query, and stop workers
+ *
+ * IMPORTANT: This server will url filter to only receive requests that match /worker/* as specified in the design doc.
+ *
+ * TODO: TESTS! Since it is much more involved than the unit tests currently written, in the interest of time and simplicity for
+ * this challenge I haven't written tests. This class is less critical than the workers and jobs/job managers as it is more dependent on
+ * api specifications and how we want to handle dealing with invalid requests/errors.
  */
 public class APIServer extends HttpServlet {
 
     private final static Logger LOGGER = Logger.getLogger(APIServer.class.getName());
     private final static int INDENT_SIZE = 4;
+    private final static String file_path_key = "file_path";
 
     private JobManager manager;
     private String invalidRequest;
     private Map<Job.JobStatus, String> statusMap;
-    private String file_path_key;
 
     @Override
     public void init() throws ServletException {
         manager = new JobManager();
         invalidRequest = new JSONObject().put("error", "invalid request").toString(INDENT_SIZE);
-        file_path_key = "file_path";
         statusMap = new HashMap<>();
         statusMap.put(Job.JobStatus.STOPPED, "stopped");
         statusMap.put(Job.JobStatus.FINISHED, "finished");
@@ -55,13 +60,7 @@ public class APIServer extends HttpServlet {
         out.flush();
     }
 
-    private String buildJobJson(Job job, boolean raw) {
-        if (raw && (job == null || job.getResult() == null)) {
-            return "";
-        }
-        if (raw) {
-            return job.getResult().getOutput();
-        }
+    private String buildJobJson(Job job) {
         if (job == null) {
             return new JSONObject().put("error", "job does not exist").toString(INDENT_SIZE);
         }
@@ -80,22 +79,21 @@ public class APIServer extends HttpServlet {
         return outputJson.toString(INDENT_SIZE);
     }
 
-    private JSONObject getRequestData(HttpServletRequest request) {
+    private JSONObject getRequestData(HttpServletRequest request) throws IOException, JSONException {
+        // TODO: Currently throwing JSONException for simplicity, but ideally should be more verbose and maybe use own exception or find
+        // a more suitable exception in other libraries (Spring MVC etc.) so there's more granularity on error responses
+        if (!request.getHeader("Content-Type").equals("application/json")) {
+            throw new JSONException("Invalid Content-Type header");
+        }
+
         StringJoiner jsonJoiner = new StringJoiner("");
         String line = null;
-        JSONObject jsonObject = null;
-        try {
-            BufferedReader reader = request.getReader();
-            while ((line = reader.readLine()) != null) {
-                jsonJoiner.add(line);
-            }
-            jsonObject = new JSONObject(jsonJoiner.toString());
-        } catch (IOException e) {
-            LOGGER.warning(String.format("Exception while reading request stream: %s", e.getMessage()));
-        } catch (JSONException e) {
-            LOGGER.warning(String.format("Exception while creating JSONOjbect: %s", e.getMessage()));
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null) {
+            jsonJoiner.add(line);
         }
-        return jsonObject;
+        reader.close();
+        return new JSONObject(jsonJoiner.toString());
     }
 
     /**
@@ -109,6 +107,7 @@ public class APIServer extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        // Basic url filtering
         String[] paths = getPaths(request);
         if (paths.length < 4) {
             out.print(invalidRequest);
@@ -118,22 +117,18 @@ public class APIServer extends HttpServlet {
         String endpoint = paths[2];
         Long pid = Long.parseLong(paths[3]);
 
-        if (endpoint.equals("stop") && paths.length > 4) {
-            printAndFlush(out, invalidRequest);
-            return;
-        }
-
         if (endpoint.equals("query")) {
-            boolean raw = false;
-            if (paths.length == 5 && paths[4].equals("raw")) {
-                raw = true;
-            } else if (paths.length > 4) {
+            if (paths.length > 4) {
                 printAndFlush(out, invalidRequest);
                 return;
             }
             Job job = manager.queryJob(pid);
-            out.print(buildJobJson(job, raw));
+            out.print(buildJobJson(job));
         } else if (endpoint.equals("stop")) {
+            if (paths.length > 4) {
+                printAndFlush(out, invalidRequest);
+                return;
+            }
             manager.stopJob(pid);
             out.print(new JSONObject().toString(INDENT_SIZE));
         } else {
@@ -153,26 +148,27 @@ public class APIServer extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        // Basic url filtering
         String[] paths = getPaths(request);
         if (!paths[2].equals("start")) {
             printAndFlush(out, invalidRequest);
             return;
         }
 
-        JSONObject requestData = getRequestData(request);
-        if (requestData == null || !requestData.has(file_path_key)) {
+        JSONObject requestData;
+        String command;
+        try {
+            requestData = getRequestData(request);
+            command = requestData.getString(file_path_key);
+        } catch (IOException | JSONException e) {
+            // Exceptions are caught together for now just because our response is the same for both and is not critical
+            // The error message in logging should determine which part of the process caused the exception (JSONObject creation vs stream reading)
+            LOGGER.warning(String.format("Exception while retrieving request data: %s", e.getMessage()));
             printAndFlush(out, invalidRequest);
             return;
         }
 
-        String command = "";
-        try {
-            command = requestData.getString(file_path_key);
-        } catch (JSONException e) {
-            LOGGER.warning(String.format("Exception while retrieving command string: %s", e.getMessage()));
-        }
         long pid = manager.addJob(new Job(command));
-
         if (pid == -1) {
             printAndFlush(out, new JSONObject().put("error", "could not execute command").toString(INDENT_SIZE));
             return;

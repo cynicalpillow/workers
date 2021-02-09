@@ -17,6 +17,11 @@ public class Job {
     private JobStatus status;
     private Result result;
 
+    /**
+     * Enums provide more readibility in this case and also allows us to easily distinguish between
+     * finished jobs and jobs that have been stopped because someone destroyed the process
+     * TODO: Adding a description method to accurately describe what each of these statuses mean
+     */
     public enum JobStatus {
         STOPPED,
         FINISHED,

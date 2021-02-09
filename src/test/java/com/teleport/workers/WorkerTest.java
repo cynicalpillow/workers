@@ -23,7 +23,7 @@ public class WorkerTest {
 
     public static void waitOnStatus(Job job, int secs) throws InterruptedException {
         int count = secs * 2;
-        while (job.getStatus() == 1 && count > 0) {
+        while (job.getStatus() == Job.JobStatus.RUNNING && count > 0) {
             TimeUnit.MILLISECONDS.sleep(500);
             --count;
         }
@@ -36,6 +36,7 @@ public class WorkerTest {
     public void workerShouldCreateResult() throws InterruptedException {
         Worker worker = new Worker();
         Job validJob = new Job("echo foobar");
+        assertEquals(validJob.getStatus(), Job.JobStatus.STOPPED);
         worker.execute(validJob);
         Process process = worker.getProcess();
         assertTrue(waitOnProcess(process));
@@ -43,7 +44,7 @@ public class WorkerTest {
         // Give another 5 secs max to make sure result is received
         WorkerTest.waitOnStatus(validJob, 5);
         assertEquals(validJob.getResult().getOutput(), "foobar");
-        assertEquals(validJob.getStatus(), 0);
+        assertEquals(validJob.getStatus(), Job.JobStatus.FINISHED);
     }
 
     /**
@@ -58,7 +59,7 @@ public class WorkerTest {
         assertTrue(waitOnProcess(process));
         WorkerTest.waitOnStatus(errorJob, 5);
         assertEquals(errorJob.getResult().getOutput(), "error message");
-        assertEquals(errorJob.getStatus(), 0);
+        assertEquals(errorJob.getStatus(), Job.JobStatus.FINISHED);
     }
 
     /**
@@ -76,7 +77,7 @@ public class WorkerTest {
         // Leave time for handling stream closing
         WorkerTest.waitOnStatus(longJob, 5);
         assertTrue(process.isAlive() == false);
-        assertEquals(longJob.getStatus(), 0);
+        assertEquals(longJob.getStatus(), Job.JobStatus.STOPPED);
     }
 
     /**
@@ -103,7 +104,7 @@ public class WorkerTest {
         WorkerTest.waitOnStatus(timeJob, 5);
 
         assertEquals(output, timeJob.getResult().getOutput());
-        assertEquals(timeJob.getStatus(), 0);
+        assertEquals(timeJob.getStatus(), Job.JobStatus.FINISHED);
     }
 
     /**
@@ -116,6 +117,6 @@ public class WorkerTest {
         worker.execute(job);
 
         assertNull(worker.getProcess());
-        assertEquals(job.getStatus(), -1);
+        assertEquals(job.getStatus(), Job.JobStatus.ERROR);
     }
 }

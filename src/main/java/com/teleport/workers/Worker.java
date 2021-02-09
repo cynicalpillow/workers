@@ -35,13 +35,14 @@ public class Worker implements Runnable {
         try {
             String output = readStream(outputStream);
             job.setResult(new Result(output.toString()));
+            job.setStatus(Job.JobStatus.FINISHED);
         } catch (IOException e) {
             // This could happen when we stop the process
             LOGGER.warning(String.format("Exception while reading stream: %s", e.getMessage()));
-        } catch (IllegalArgumentException e) {
-            LOGGER.severe(String.format("Exception while setting status: %s", e.getMessage()));
+            job.setStatus(Job.JobStatus.STOPPED);
         } catch (IllegalStateException e) {
             LOGGER.warning(String.format("Exception while assigning result: %s", e.getMessage()));
+            job.setStatus(Job.JobStatus.FINISHED);
         } finally {
             try {
                 outputStream.close();
@@ -55,7 +56,6 @@ public class Worker implements Runnable {
                 LOGGER.warning(String.format("Thread interrupted while waiting for process termination: %s", e.getMessage()));
                 stopProcess();
             }
-            job.setStatus(0);
         }
     }
 
@@ -73,11 +73,11 @@ public class Worker implements Runnable {
             process = builder.start();
         } catch (IOException e) {
             LOGGER.severe(String.format("Could not start process: %s", e.getMessage()));
-            this.job.setStatus(-1);
+            this.job.setStatus(Job.JobStatus.ERROR);
             return -1;
         }
 
-        job.setStatus(1);
+        job.setStatus(Job.JobStatus.RUNNING);
         new Thread(this).start();
         return process.toHandle().pid();
     }
@@ -96,7 +96,7 @@ public class Worker implements Runnable {
             LOGGER.warning(String.format("Thread interrupted while destroying process: %s", e.getMessage()));
             process.destroyForcibly();
         } finally {
-            job.setStatus(0);
+            job.setStatus(Job.JobStatus.STOPPED);
         }
     }
 

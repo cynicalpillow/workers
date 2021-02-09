@@ -27,6 +27,6 @@ public class JobManagerTest {
         Result result = manager.queryJob(pid).getResult();
         assertNotNull(result);
         assertEquals(result.getOutput(), "foobar");
-        assertEquals(job2.getStatus(), 0);
+        assertEquals(job2.getStatus(), Job.JobStatus.FINISHED);
     }
 }

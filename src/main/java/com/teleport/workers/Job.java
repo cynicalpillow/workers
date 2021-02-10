@@ -8,15 +8,21 @@ import java.util.List;
  * Represents an arbitrary Linux application or command
  *
  * Status values:
- * 0 - Not executing (finished or hasn't been queued)
- * 1 - Executing
- * -1 - Error (job couldn't be ran or another error occured while creating the process)
+ * STOPPED - Not executing or stopped by API
+ * FINISHED - Finished running
+ * RUNNING - Executing
+ * ERROR - Job couldn't be ran or another error occured while creating the process
  */
 public class Job {
     private List<String> command;
     private JobStatus status;
     private Result result;
 
+    /**
+     * Enums provide more readibility in this case and also allows us to easily distinguish between
+     * finished jobs and jobs that have been stopped because someone destroyed the process
+     * TODO: Adding a description method to accurately describe what each of these statuses mean
+     */
     public enum JobStatus {
         STOPPED,
         FINISHED,

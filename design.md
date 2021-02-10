@@ -22,7 +22,7 @@ To keep things simple, the REST API will have no authentication. Endpoints retur
 Responses will be of the form:
 ```json
 {
-	"pid": number
+	"pid": 12345
 }
 ```
 

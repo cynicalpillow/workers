@@ -40,7 +40,9 @@ Build jar
 mvn package
 ```
 Deploy to embedded Tomcat to use API
+
 **NOTE:** Make sure Tomcat service is not already running otherwise this will fail!
+
 ```bash
 mvn package tomcat:run-war
 # OR

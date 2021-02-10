@@ -16,7 +16,9 @@ Verify installation with
 mvn -version
 ```
 **Apache Tomcat**
+
 Tomcat version >= 8
+
 ```bash
 sudo apt update
 sudo apt install tomcat9

@@ -22,7 +22,7 @@ To keep things simple, the REST API will have no authentication. Endpoints retur
 Responses will be of the form:
 ```json
 {
-	"pid": 12345
+    "pid": 12345
 }
 ```
 
@@ -35,9 +35,9 @@ Responses will be of the form:
 Responses will be of the form:
 ```json
 {
-	"output": "string",
-	"command": "string",
-	"status": "string"
+    "output": "string",
+    "command": "string",
+    "status": "string"
 }
 ```
 **NOTE:** Output string is a JSON string so cannot be multi-line.

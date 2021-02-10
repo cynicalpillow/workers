@@ -109,8 +109,8 @@ public class APIServer extends HttpServlet {
 
         // Basic url filtering
         String[] paths = getPaths(request);
-        if (paths.length < 4) {
-            out.print(invalidRequest);
+        if (paths.length != 4) {
+            printAndFlush(out, invalidRequest);
             return;
         }
 
@@ -118,17 +118,9 @@ public class APIServer extends HttpServlet {
         Long pid = Long.parseLong(paths[3]);
 
         if (endpoint.equals("query")) {
-            if (paths.length > 4) {
-                printAndFlush(out, invalidRequest);
-                return;
-            }
             Job job = manager.queryJob(pid);
             out.print(buildJobJson(job));
         } else if (endpoint.equals("stop")) {
-            if (paths.length > 4) {
-                printAndFlush(out, invalidRequest);
-                return;
-            }
             manager.stopJob(pid);
             out.print(new JSONObject().toString(INDENT_SIZE));
         } else {
@@ -150,7 +142,7 @@ public class APIServer extends HttpServlet {
 
         // Basic url filtering
         String[] paths = getPaths(request);
-        if (!paths[2].equals("start")) {
+        if (paths.length != 3 || !paths[2].equals("start")) {
             printAndFlush(out, invalidRequest);
             return;
         }

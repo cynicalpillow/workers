@@ -32,9 +32,11 @@ This will be useful if we want to deploy to embedded Tomcat.
 **NOTE:** Installing from binary is bit more involved and may require more troubleshooting and configuration as I haven't tried this route. If there's any questions, feel free to ping me on Slack.
 
 ## Build
+
+Make sure to run these commands in the project root.
+
 Run tests
 ```bash
-# navigate to workers repository project root
 mvn test
 ```
 Build jar
